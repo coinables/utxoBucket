@@ -91,17 +91,28 @@ button {
 	position: relative;
 	display: none;
 }
+a {
+	color: #0275d8;
+}
+a:visited {
+	color: #0275d8;
+}
 </style>
 </head>
 <body>
 <span id="hdr">utxo</span><span id="header"><em>BUCKET</em></span>
 <br><br>
-<div id="addressBar"><b>Add an Address:</b> <input type="text" id="address" class="frm"> <button id="getaddr">GET UTXOs</button></div>
-<br>
 <h3>Balance</h3>
 <div id="balance_container">
 <input type="text" id="balance" class="frm">&nbsp;&nbsp;<input type="text" id="balanceusd" class="frm" readonly>
 </div>
+<br>
+<br>
+<div id="addressBar"><b>Add an Address:</b> <input type="text" id="address" class="frm"> <button id="getaddr">GET UTXOs</button></div>
+
+<p>Enter an address to scan for Unspent Transaction Outputs (UTXOs) or simply bitcoins that have not yet been spent. If you 
+have the associated WIF private key to that address you can also specifically select which ones you want to spend. This actually creates 
+and broadcasts the transaction to the bitcoin network. Use at your own risk.</p>
 <br>
 <hr>
 <h3>Addresses</h3>
@@ -138,7 +149,7 @@ button {
 	</tr>
 </table>
 
-<div id="floating_exchange_div">Enter USD Value of 1 BTC
+<div id="floating_exchange_div">Enter USD Value of 1 BTC(offline mode), or <a href="#" id="websync">sync websocket</a>
 <input type="text" id="exchange_rate" onchange="return changeExchange();" class="frm">
 <input type="hidden" id="viewing">
 <input type="hidden" id="totalselected">
@@ -602,6 +613,22 @@ function changeExchange(){
 	
 }
 
+var synclink = document.getElementById("websync")
+synclink.onclick = function(){
+	var ws = new WebSocket("wss://api-pub.bitfinex.com/ws/2");
+	ws.onopen = function(){
+	  ws.send(JSON.stringify({"event":"subscribe", "channel":"ticker", "pair":"BTCUSD"}))
+	};
+	ws.onmessage = function(msg){
+	  var response = JSON.parse(msg.data);
+	  var hb = response[1];
+	  if(hb !== "hb"){
+		document.getElementById("exchange_rate").value = response[1][0];
+		changeExchange();
+	  }
+	};
+} 
+
 function allStorage() {
 
     var values = [],
@@ -680,5 +707,7 @@ $("#getaddr").click(function(){
 	
 
 </script>
+<br><br>
+API to obtain UTXOs and broadcast transactions provided by: smartbit.com.au 
 </body>
 </html>
