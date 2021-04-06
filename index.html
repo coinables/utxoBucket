@@ -598,8 +598,8 @@ function calcTotal(numinputs,numoutputs,satperbyte,totalsatoshis){
 	return totalSatoshisMinusFee
 }
 
-function getByteCountSegwitP2SH(inputCount,outputCount,isMultisig,m,n) {
-	  var inputSize = isMultisig ? ((73 * m) + (34 * n) + 6 + (76 * 4)) : 108 + (64 * 4)
+function getByteCountSegwitP2SH(inputCount,outputCount) {
+	  var inputSize = 108 + (64 * 4)
 	  var outputSize = 34 * 4
 	  var estimatedWeight = inputSize * inputCount + outputSize * outputCount + 10 * 4
 	  return Math.ceil(estimatedWeight / 4)
